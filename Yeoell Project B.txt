@@ -1,0 +1,80 @@
+# Dan's Port Scanner'
+
+# import needed libraries
+import datetime
+import socket
+import pyfiglet
+import sys
+
+# Create a text file for our results
+scn_fl = open("Dan's Port Scan.txt", "w")
+scn_fl.write("Welcome to the City of Brotherly LOVE\n\n")
+
+try:
+
+    ascii_banner = pyfiglet.figlet_format("DANS PORT SCANNER")
+    print(ascii_banner)
+
+# Ask the user for a target & obtain the IP address of the target
+    target = input("Pick a host, any host:")
+
+    host_ip = socket.gethostbyname(target)
+    print("{} : {}".format(target, host_ip))
+
+# Timestamp the start of the scan
+    t1 = datetime.datetime.now()
+    print(t1)
+    scn_fl.write("Starting time is {}\n\n".format(t1))
+
+# Initial set up for scan loop
+    port = 1
+
+    choice = "y"
+
+# Run our scan loop
+    while choice == "y":
+
+        pn_cnt = 0
+
+        for port in range(1, 1026):
+
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(1)
+            status = sock.connect_ex((host_ip, port))
+            print(status)
+            if status == 0:
+                print("{} : {} code:{}".format(host_ip, port, status))
+                scn_fl.write("{} : Port {} is open\n".format(target, port))
+                pn_cnt += 1
+
+            port += 1
+
+        scn_fl.write("Total open ports: {} \n\n".format(pn_cnt))
+
+# ask for an additional target
+        choice = input("Do you have another target? (y/n)")
+        if choice == "y":
+            target = input("Pick a host, any host:")
+            host_ip = socket.gethostbyname(target)
+
+# ending timestamp
+    t2 = datetime.datetime.now()
+    print(t2)
+    scn_fl.write("Ending time is " + str(t2) + "\n\n")
+
+    # Calculate the total time as t3
+    t3 = t2 - t1
+
+    print("{} : Port {} is open".format(target, port))
+
+except KeyboardInterrupt:
+    print("\n Exiting Program !!!!")
+    sys.exit()
+except socket.gaierror:
+    print("\n Hostname Could Not Be Resolved !!!!")
+    sys.exit()
+except socket.error:
+    print("\n Server not responding !!!!")
+    sys.exit()
+
+scn_fl.close()
